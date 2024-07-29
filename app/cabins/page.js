@@ -1,4 +1,5 @@
 import CabinCard from "@/app/_components/CabinCard";
+import { getCabins } from "../_lib/data-service";
 
 export const metadata = {
   title: "Cabins",
@@ -9,10 +10,8 @@ export const metadata = {
  * @returns {JSX.Element}
  * @author Anik Paul
  */
-
-export default function Page() {
-  // CHANGE
-  const cabins = [];
+export default async function Page() {
+  const cabins = await getCabins();
 
   return (
     <div>
