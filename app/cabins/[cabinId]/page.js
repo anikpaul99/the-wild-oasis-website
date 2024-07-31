@@ -4,6 +4,18 @@ import Image from "next/image";
 import { getCabin } from "@/app/_lib/data-service";
 
 /**
+ * Will generate a dynamic title for each specific cabin. (e.g. Cabin 001)
+ * @prop {Object} params The param, which is the object that will hold the 'cabinId' from the URL.
+ * @returns {Object}
+ * @author Anik Paul
+ */
+export async function generateMetadata({ params }) {
+  const { name } = await getCabin(params.cabinId);
+
+  return { title: `Cabin ${name}` };
+}
+
+/**
  * Information about specific cabin with the coresponding id. Will be rendered when visited to '/cabin/cabinId'.
  * @prop {Object} params The param, which is the object that will hold the 'cabinId' from the URL.
  * @returns {JSX.Element}
