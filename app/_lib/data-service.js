@@ -44,3 +44,20 @@ export const getCabins = async function () {
 
   return data;
 };
+
+/**
+ * Will return the countries data.
+ * @returns {Object[]} An array objects, where each object represent a country. Each country object contains the 'name', 'flag', 'independent'.
+ * @author Anik Paul
+ */
+export async function getCountries() {
+  try {
+    const res = await fetch(
+      "https://restcountries.com/v2/all?fields=name,flag"
+    );
+    const countries = await res.json();
+    return countries;
+  } catch {
+    throw new Error("Could not fetch countries");
+  }
+}
