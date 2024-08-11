@@ -46,6 +46,22 @@ export const getCabins = async function () {
 };
 
 /**
+ * Will get the guest with the coresponding 'email' from the 'guests' table in the database. Guests are uniquely identified by their email address.
+ * @param {string} email the email of the guest of which data we want to retrieve from the 'guests' table in the database.
+ * @returns {Object} Object containing the 'id', 'created_at', 'fullName', 'email', 'nationalId', 'nationality', 'countryFlag' of the guest.
+ * @author Anik Paul
+ */
+export async function getGuest(email) {
+  const { data, error } = await supabase
+    .from("guests")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  return data;
+}
+
+/**
  * Will get all the dates that have been booked already. First it will get all the bookings from supabase. Then it will convert them to actual dates to be displayed in the date picker.
  * @param {string} cabinId the cabin id from the url.
  * @returns {Object []} Each date will be in 'ISO 8601 date string' type. e.g  [ 024-08-10T18:00:00.000Z, 2024-08-11T18:00:00.000Z, 2024-08-12T18:00:00.000Z]
@@ -112,4 +128,23 @@ export async function getCountries() {
   } catch {
     throw new Error("Could not fetch countries");
   }
+}
+
+/////////////
+// CREATE
+
+/**
+ * Will create a new guest in the 'guests' table in the database.
+ * @param {object} newGuest Object containing 'email' and 'fullName' that we want to set for the newly created guest in the 'guests' table in the database.
+ * @author Anik Paul
+ */
+export async function createGuest(newGuest) {
+  const { data, error } = await supabase.from("guests").insert([newGuest]);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Guest could not be created");
+  }
+
+  return data;
 }
