@@ -62,6 +62,29 @@ export async function getGuest(email) {
 }
 
 /**
+ * Will fetch all the bookings data matched by the 'guestId' passed into the function from the database.
+ * @param {string} guestId The id of the guest, whose bookings data will be fetched from the database.
+ * @returns {Object[]} Array containing an object which holds the data about the guests all bookings. The object contains the 'id', 'created_at', 'startDate', 'endDate', 'numNights', 'totalPrice', 'guestId', 'cabinId', 'cabins' - related to the particular reservation/booking.. The 'name' and 'image' is also fetched from the 'cabins'.
+ * @author Anik Paul
+ */
+export async function getBookings(guestId) {
+  const { data, error, count } = await supabase
+    .from("bookings")
+    .select(
+      "id, created_at, startDate, endDate, numNights, numGuests, totalPrice, guestId, cabinId, cabins(name, image)"
+    )
+    .eq("guestId", guestId)
+    .order("startDate");
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
+
+  return data;
+}
+
+/**
  * Will get all the dates that have been booked already. First it will get all the bookings from supabase. Then it will convert them to actual dates to be displayed in the date picker.
  * @param {string} cabinId the cabin id from the url.
  * @returns {Object []} Each date will be in 'ISO 8601 date string' type. e.g  [ 024-08-10T18:00:00.000Z, 2024-08-11T18:00:00.000Z, 2024-08-12T18:00:00.000Z]
