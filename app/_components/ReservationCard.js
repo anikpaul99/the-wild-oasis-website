@@ -12,11 +12,12 @@ export const formatDistanceFromNow = (dateStr) =>
 
 /**
  * Each 'past' / 'upcoming' reservation/booking of the guest. Will display which cabin was reserved, also how many nights the guest stayed or want to stay. Will display the time of when the cabin was reserved. Will display the number of guest and also the price of the cabin. Only the 'upcoming' reservation will have the option to be edited or deleted.
- * @prop {Object} booking The object contains the 'id', 'created_at', 'startDate', 'endDate', 'numNights', 'totalPrice', 'guestId', 'cabinId', 'cabins' - related to the particular reservation/booking..
+ * @prop {Object} booking The object contains the 'id', 'created_at', 'startDate', 'endDate', 'numNights', 'totalPrice', 'guestId', 'cabinId', 'cabins' - related to the particular reservation/booking.
+ * @prop {function} onDelete the function to be responsible for the delete operation of a reservation.
  * @returns {JSX.Element}
  * @author Anik Paul
  */
-function ReservationCard({ booking }) {
+function ReservationCard({ booking, onDelete }) {
   const {
     id,
     guestId,
@@ -87,7 +88,7 @@ function ReservationCard({ booking }) {
               <PencilSquareIcon className="h-5 w-5 text-primary-600 group-hover:text-primary-800 transition-colors" />
               <span className="mt-1">Edit</span>
             </Link>
-            <DeleteReservation bookingId={id} />
+            <DeleteReservation bookingId={id} onDelete={onDelete} />
           </>
         ) : null}
       </div>
