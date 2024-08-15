@@ -3,6 +3,8 @@
 import { auth, signIn, signOut } from "./auth";
 import { supabase } from "./supabase";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
 import { getBookings } from "./data-service";
 
 /**
@@ -55,6 +57,43 @@ export async function deleteReservation(bookingId) {
   if (error) throw new Error("Booking could not be deleted");
 
   revalidatePath("/account/reservations");
+}
+
+/**
+ * Update a reservation.
+ * @param {Object} formData all the form data that have been passed from the '[bookingId]/page.js'. 'formData' contains updated reservations 'id', 'numGuests', 'observations'.
+ * @author Anik Paul
+ */
+export async function updateReservation(formData) {
+  const bookingId = Number(formData.get("bookingId"));
+
+  const session = await auth();
+  if (!session) throw new Error("You must be logged in");
+
+  const guestBookings = await getBookings(session.user.guestId);
+  const guestBookingsIds = guestBookings.map((booking) => booking.id);
+
+  if (!guestBookingsIds.includes(bookingId))
+    throw new Error("You are not allowed to update this booking");
+
+  const updateData = {
+    numGuests: Number(formData.get("numGuests")),
+    observations: formData.get("observations").slice(0, 1000),
+  };
+
+  const { error } = await supabase
+    .from("bookings")
+    .update(updateData)
+    .eq("id", bookingId)
+    .select()
+    .single();
+
+  if (error) throw new Error("Booking could not be updated");
+
+  revalidatePath(`/account/reservations/edit/${bookingId}`);
+  revalidatePath("/account/reservations");
+
+  redirect("/account/reservations");
 }
 
 export async function signInAction() {

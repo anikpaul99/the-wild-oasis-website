@@ -62,6 +62,27 @@ export async function getGuest(email) {
 }
 
 /**
+ * Will fetch a single booking data matched by the id passed into the function from the database.
+ * @param {string} id The id (from the URL) of the booking  which data will be fetched from the database.
+ * @returns {Object} The booking data along with cabin data and guest data for that particular id.
+ * @author Anik Paul
+ */
+export async function getBooking(id) {
+  const { data, error, count } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not get loaded");
+  }
+
+  return data;
+}
+
+/**
  * Will fetch all the bookings data matched by the 'guestId' passed into the function from the database.
  * @param {string} guestId The id of the guest, whose bookings data will be fetched from the database.
  * @returns {Object[]} Array containing an object which holds the data about the guests all bookings. The object contains the 'id', 'created_at', 'startDate', 'endDate', 'numNights', 'totalPrice', 'guestId', 'cabinId', 'cabins' - related to the particular reservation/booking.. The 'name' and 'image' is also fetched from the 'cabins'.
