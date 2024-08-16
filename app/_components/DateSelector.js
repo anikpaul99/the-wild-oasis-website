@@ -1,18 +1,24 @@
 "use client";
 
 import "react-day-picker/dist/style.css";
-import { isWithinInterval } from "date-fns";
+import {
+  differenceInDays,
+  isPast,
+  isSameDay,
+  isWithinInterval,
+} from "date-fns";
 import { DayPicker } from "react-day-picker";
 
 import { useReservation } from "./ReservationContext";
 
 function isAlreadyBooked(range, datesArr) {
-  return (
-    range.from &&
-    range.to &&
-    datesArr.some((date) =>
-      isWithinInterval(date, { start: range.from, end: range.to })
-    )
+  // Check if range is defined and has 'from' and 'to' properties
+  if (!range || !range.from || !range.to) {
+    return false;
+  }
+
+  return datesArr.some((date) =>
+    isWithinInterval(date, { start: range.from, end: range.to })
   );
 }
 
@@ -20,20 +26,24 @@ function isAlreadyBooked(range, datesArr) {
  * A date picker, from where the user will be able to select a range of dates. Will be rendered when visited to '/cabin/cabinId'.
  * @prop {Object} settings Object contains 'id', 'created_at', 'minBookingLength', 'maxBookingLength', 'maxGuestsPerBooking', 'breakfastPrice'.
  * @prop {Object} cabin The cabins data including 'id', 'name', 'maxCapacity', 'regularPrice', 'discount', 'image'.
- * @prop {Object []} bookedDates Each date will be in 'ISO 8601 date string' type. e.g  [ 024-08-10T18:00:00.000Z, 2024-08-11T18:00:00.000Z, 2024-08-12T18:00:00.000Z]
+ * @prop {Object []} bookedDates All the dates that have been booked already. Each date will be in 'ISO 8601 date string' type. e.g  [ 024-08-10T18:00:00.000Z, 2024-08-11T18:00:00.000Z, 2024-08-12T18:00:00.000Z]
  * @returns {JSX.Element}
  * @author Anik Paul
  */
 function DateSelector({ settings, cabin, bookedDates }) {
   const { range, setRange, resetRange } = useReservation();
 
-  // CHANGE
-  const regularPrice = 23;
-  const discount = 23;
-  const numNights = 23;
-  const cabinPrice = 23;
+  const displayRange = isAlreadyBooked(range, bookedDates) ? {} : range;
 
-  // SETTINGS
+  let numNights = 0; // Default value in case displayRange is not valid
+
+  if (displayRange && displayRange.from && displayRange.to) {
+    numNights = differenceInDays(displayRange.to, displayRange.from);
+  }
+
+  const { regularPrice, discount } = cabin;
+  const cabinPrice = numNights * (regularPrice - discount);
+
   const { minBookingLength, maxBookingLength } = settings;
 
   return (
@@ -42,7 +52,7 @@ function DateSelector({ settings, cabin, bookedDates }) {
         className="pt-12 place-self-center"
         mode="range"
         onSelect={setRange}
-        selected={range}
+        selected={displayRange}
         min={minBookingLength + 1}
         max={maxBookingLength}
         fromMonth={new Date()}
@@ -50,6 +60,10 @@ function DateSelector({ settings, cabin, bookedDates }) {
         toYear={new Date().getFullYear() + 5}
         captionLayout="dropdown"
         numberOfMonths={2}
+        disabled={(curDate) =>
+          isPast(curDate) ||
+          bookedDates.some((date) => isSameDay(date, curDate))
+        }
       />
 
       <div className="flex items-center justify-between px-8 bg-accent-500 text-primary-800 h-[72px]">
@@ -80,7 +94,7 @@ function DateSelector({ settings, cabin, bookedDates }) {
           ) : null}
         </div>
 
-        {range.from || range.to ? (
+        {range && (range.from || range.to) ? (
           <button
             className="border border-primary-800 py-2 px-4 text-sm font-semibold"
             onClick={resetRange}
