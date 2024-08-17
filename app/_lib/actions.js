@@ -4,6 +4,7 @@ import { auth, signIn, signOut } from "./auth";
 import { supabase } from "./supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isWithinInterval } from "date-fns";
 
 import { getBookings } from "./data-service";
 
@@ -32,6 +33,79 @@ export async function updateGuest(formData) {
   if (error) throw new Error("Guest could not be updated");
 
   revalidatePath("/account/profile");
+}
+
+/**
+ * Create a new reservation.
+ * @param {Object} reservationData object containing all the necessary data for the reservation. it contains: 'startDate', 'endDate', 'numNights', 'cabinPrice', 'cabinId'.
+ * @param {Object} formData all the form data that have been passed from the ReservationForm. 'formData' contains 'numGuests', 'observations' from the input field.
+ * @author Anik Paul
+ */
+export async function createReservation(reservationData, formData) {
+  const session = await auth();
+  if (!session) throw new Error("You must be logged in");
+
+  const { startDate, endDate, cabinId } = reservationData;
+
+  // Ensure startDate and endDate are in ISO 8601 format
+  const startDateISO = new Date(startDate).toISOString();
+  const endDateISO = new Date(endDate).toISOString();
+
+  // Step 1: Check if the dates overlap with any existing bookings
+  const { data: existingBookings, error: fetchError } = await supabase
+    .from("bookings")
+    .select("startDate, endDate")
+    .eq("cabinId", cabinId)
+    .filter("startDate", "lte", endDateISO)
+    .filter("endDate", "gte", startDateISO); // Use multiple filters for date range overlap
+
+  if (fetchError) {
+    console.error(fetchError);
+    throw new Error("Error checking existing bookings");
+  }
+
+  // Step 2: Check if any of the existing bookings overlap with the requested dates
+  const isOverlap = existingBookings.some((booking) => {
+    const bookingInterval = {
+      start: new Date(booking.startDate),
+      end: new Date(booking.endDate),
+    };
+    const requestedInterval = {
+      start: new Date(startDate),
+      end: new Date(endDate),
+    };
+    return (
+      isWithinInterval(requestedInterval.start, bookingInterval) ||
+      isWithinInterval(requestedInterval.end, bookingInterval) ||
+      isWithinInterval(bookingInterval.start, requestedInterval) ||
+      isWithinInterval(bookingInterval.end, requestedInterval)
+    );
+  });
+
+  if (isOverlap) {
+    throw new Error("Selected dates are already booked");
+  }
+
+  // Step 3: If no overlap, proceed with creating the reservation
+  const newReservation = {
+    ...reservationData,
+    guestId: session.user.guestId,
+    numGuests: Number(formData.get("numGuests")),
+    observations: formData.get("observations").slice(0, 1000),
+    extrasPrice: 0,
+    totalPrice: reservationData.cabinPrice,
+    isPaid: false,
+    hasBreakfast: false,
+    status: "unconfirmed",
+  };
+
+  const { error } = await supabase.from("bookings").insert([newReservation]);
+
+  if (error) throw new Error("Booking could not be created");
+
+  revalidatePath(`/cabins/${reservationData.cabinId}`);
+
+  redirect("/cabins/thankyou");
 }
 
 /**
