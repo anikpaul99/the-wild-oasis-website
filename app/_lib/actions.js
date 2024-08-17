@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isWithinInterval } from "date-fns";
 
-import { getBookings } from "./data-service";
+import { getBookings, getGuest } from "./data-service";
 
 /**
  * Update the guests profile.
@@ -17,6 +17,12 @@ export async function updateGuest(formData) {
   const session = await auth();
   if (!session) throw new Error("You must be logged in");
 
+  const {
+    nationality: nationalityCurrent,
+    countryFlag: countryFlagCurrent,
+    nationalID: nationalIDCurrent,
+  } = await getGuest(session.user.email);
+
   const nationalID = formData.get("nationalID");
   const [nationality, countryFlag] = formData.get("nationality").split("%");
 
@@ -25,7 +31,14 @@ export async function updateGuest(formData) {
 
   const updateData = { nationality, countryFlag, nationalID };
 
-  const { data, error } = await supabase
+  if (
+    nationalityCurrent === nationality &&
+    countryFlagCurrent === countryFlag &&
+    nationalIDCurrent === nationalID
+  )
+    return;
+
+  const { error } = await supabase
     .from("guests")
     .update(updateData)
     .eq("id", session.user.guestId);
