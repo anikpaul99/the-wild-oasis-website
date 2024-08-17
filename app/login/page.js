@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/app/_lib/auth";
+
 import SignInButton from "@/app/_components/SignInButton";
 
 export const metadata = {
@@ -9,7 +12,10 @@ export const metadata = {
  * @returns {JSX.Element}
  * @author Anik Paul
  */
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+  if (session?.user) redirect("/");
+
   return (
     <div className="flex flex-col gap-10 mt-10 items-center">
       <h2 className="text-3xl font-semibold">
