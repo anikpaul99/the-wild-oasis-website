@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isWithinInterval } from "date-fns";
 
-import { getBookings, getGuest } from "./data-service";
+import { getBooking, getBookings, getGuest } from "./data-service";
 
 /**
  * Update the guests profile.
@@ -153,6 +153,8 @@ export async function deleteReservation(bookingId) {
  */
 export async function updateReservation(formData) {
   const bookingId = Number(formData.get("bookingId"));
+  const { numGuests: numGuestsCurrent, observations: observationsCurrent } =
+    await getBooking(bookingId);
 
   const session = await auth();
   if (!session) throw new Error("You must be logged in");
@@ -167,6 +169,12 @@ export async function updateReservation(formData) {
     numGuests: Number(formData.get("numGuests")),
     observations: formData.get("observations").slice(0, 1000),
   };
+
+  if (
+    numGuestsCurrent === updateData.numGuests &&
+    observationsCurrent === updateData.observations
+  )
+    return;
 
   const { error } = await supabase
     .from("bookings")
