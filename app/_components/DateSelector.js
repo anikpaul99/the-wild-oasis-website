@@ -22,6 +22,14 @@ function isAlreadyBooked(range, datesArr) {
   );
 }
 
+function convertToUTC(date) {
+  // Convert date to UTC at midnight
+  const utcDate = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  return utcDate;
+}
+
 /**
  * A date picker, from where the user will be able to select a range of dates. Will be rendered when visited to '/cabin/cabinId'.
  * @prop {Object} settings Object contains 'id', 'created_at', 'minBookingLength', 'maxBookingLength', 'maxGuestsPerBooking', 'breakfastPrice'.
@@ -51,7 +59,17 @@ function DateSelector({ settings, cabin, bookedDates }) {
       <DayPicker
         className="pt-12 place-self-center"
         mode="range"
-        onSelect={setRange}
+        onSelect={(selectedRange) => {
+          if (selectedRange?.from && selectedRange?.to) {
+            const correctedSelectedRange = {
+              from: convertToUTC(selectedRange.from),
+              to: convertToUTC(selectedRange.to),
+            };
+            setRange(correctedSelectedRange);
+          } else {
+            setRange(selectedRange);
+          }
+        }}
         selected={displayRange}
         min={minBookingLength + 1}
         max={maxBookingLength}
