@@ -21,23 +21,23 @@ function CabinCard({ cabin }) {
         />
       </div>
 
-      <div className="flex-grow">
-        <div className="pt-5 pb-4 px-7 bg-primary-950">
-          <h3 className="text-accent-500 font-semibold text-2xl mb-3">
+      <div className="xs:flex-grow">
+        <div className="md:pt-5 md:pb-4 md:px-7 pt-3 pb-3 px-4 bg-primary-950">
+          <h3 className="text-accent-500 font-semibold md:text-2xl text-lg mb-3">
             Cabin {name}
           </h3>
 
-          <div className="flex gap-3 items-center mb-2">
-            <UsersIcon className="h-5 w-5 text-primary-600" />
-            <p className="text-lg text-primary-200">
+          <div className="flex md:gap-3 gap-2 items-center md:mb-2 mb-1">
+            <UsersIcon className="md:h-5 md:w-5 h-4 w-4 text-primary-600" />
+            <p className="md:text-lg text-base text-primary-200">
               For up to <span className="font-bold">{maxCapacity}</span> guests
             </p>
           </div>
 
-          <p className="flex gap-3 justify-end items-baseline">
+          <p className="flex md:gap-3 gap-2 justify-end items-baseline">
             {discount > 0 ? (
               <>
-                <span className="text-3xl font-[350]">
+                <span className="md:text-3xl text-[20px] font-[350]">
                   ${regularPrice - discount}
                 </span>
                 <span className="line-through font-semibold text-primary-600">
@@ -45,7 +45,9 @@ function CabinCard({ cabin }) {
                 </span>
               </>
             ) : (
-              <span className="text-3xl font-[350]">${regularPrice}</span>
+              <span className="md:text-3xl text-[20px] font-[350]">
+                ${regularPrice}
+              </span>
             )}
             <span className="text-primary-200">/ night</span>
           </p>
@@ -54,7 +56,7 @@ function CabinCard({ cabin }) {
         <div className="bg-primary-950 border-t border-t-primary-800 text-right">
           <Link
             href={`/cabins/${id}`}
-            className="border-l border-primary-800 py-4 px-6 inline-block hover:bg-accent-600 transition-all hover:text-primary-900"
+            className="border-l border-primary-800 md:py-4 md:px-6 py-2 px-4 inline-block hover:bg-accent-600 transition-all hover:text-primary-900"
           >
             Details & reservation &rarr;
           </Link>

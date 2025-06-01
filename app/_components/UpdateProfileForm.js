@@ -15,7 +15,7 @@ function UpdateProfileForm({ guest, children }) {
   return (
     <form
       action={updateGuest}
-      className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col"
+      className="bg-primary-900 lg:py-8 lg:px-12 md:py-8 py-6 md:px-10 sm:px-8 px-6 text-lg flex md:gap-6 gap-4 flex-col"
     >
       <div className="space-y-2">
         <label>Full name</label>
@@ -23,7 +23,7 @@ function UpdateProfileForm({ guest, children }) {
           disabled
           defaultValue={fullName}
           name="fullName"
-          className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-gray-400"
+          className="md:px-5 md:py-3 px-3 py-2 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-gray-400"
         />
       </div>
 
@@ -33,7 +33,7 @@ function UpdateProfileForm({ guest, children }) {
           disabled
           defaultValue={email}
           name="email"
-          className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-gray-400"
+          className="md:px-5 md:py-3 px-3 py-2 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-gray-400"
         />
       </div>
 
@@ -43,7 +43,7 @@ function UpdateProfileForm({ guest, children }) {
           <img
             src={countryFlag}
             alt="Country flag"
-            className="h-5 rounded-sm"
+            className="md:h-5 h-3 rounded-sm"
           />
         </div>
         {children}
@@ -54,11 +54,11 @@ function UpdateProfileForm({ guest, children }) {
         <input
           defaultValue={nationalID}
           name="nationalID"
-          className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+          className="md:px-5 md:py-3 px-3 py-2 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
         />
       </div>
 
-      <div className="flex justify-end items-center gap-6">
+      <div className="flex justify-end items-center md:gap-6 gap-4">
         <SubmitButton pendingLabel="Updating...">Update profile</SubmitButton>
       </div>
     </form>

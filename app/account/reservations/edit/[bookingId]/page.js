@@ -15,13 +15,13 @@ export default async function Page({ params }) {
 
   return (
     <div>
-      <h2 className="font-semibold text-2xl text-accent-400 mb-7">
+      <h2 className="font-semibold sm:text-2xl text-accent-400 mb-7">
         Edit Reservation #{bookingId}
       </h2>
 
       <form
         action={updateReservation}
-        className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col"
+        className="bg-primary-900 md:py-8 py-6 md:px-12 sm:px-8 px-6 text-lg flex md:gap-6 gap-4 flex-col"
       >
         <input type="hidden" value={bookingId} name="bookingId" />
 
@@ -31,7 +31,7 @@ export default async function Page({ params }) {
             name="numGuests"
             id="numGuests"
             defaultValue={numGuests}
-            className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+            className="md:px-5 md:py-3 px-3 py-2 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
             required
           >
             <option value="" key="">
@@ -52,11 +52,11 @@ export default async function Page({ params }) {
           <textarea
             name="observations"
             defaultValue={observations}
-            className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+            className="md:px-5 md:py-3 px-3 py-2 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
           />
         </div>
 
-        <div className="flex justify-end items-center gap-6">
+        <div className="flex justify-end items-center md:gap-6 gap-4">
           <SubmitButton pendingLabel="Updating...">
             Update reservation
           </SubmitButton>
